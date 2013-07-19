@@ -2,8 +2,8 @@
 
 sego分词服务器同时提供了两种模式：
 
-	"/"	下运行分词演示网页
-	"/json"	下运行JSON格式的RPC服务
+	"/"	分词演示网页
+	"/json"	JSON格式的RPC服务
 		输入：
 			POST或GET模式输入text参数
 		输出JSON格式：
