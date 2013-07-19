@@ -1,0 +1,74 @@
+// 测试sego并行分词速度
+
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"github.com/huichen/sego"
+	"log"
+	"os"
+	"runtime"
+	"time"
+)
+
+var (
+	segmenter  = sego.Segmenter{}
+	numThreads = runtime.NumCPU()
+	task       = make(chan []byte, numThreads)
+	numRuns    = 10
+)
+
+func worker() {
+	for {
+		segmenter.Segment(<-task)
+	}
+}
+
+func main() {
+	// 将线程数设置为CPU数
+	runtime.GOMAXPROCS(numThreads)
+
+	// 载入词典
+	segmenter.LoadDictionary("../data/dictionary.txt")
+
+	// 打开将要分词的文件
+	file, err := os.Open("../testdata/bailuyuan.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// 逐行读入
+	scanner := bufio.NewScanner(file)
+	size := 0
+	lines := [][]byte{}
+	for scanner.Scan() {
+		var text string
+		fmt.Sscanf(scanner.Text(), "%s", &text)
+		content := []byte(text)
+		size += len(content)
+		lines = append(lines, content)
+	}
+
+	// 启动工作线程
+	for i := 0; i < numThreads; i++ {
+		go worker()
+	}
+	log.Print("开始分词")
+
+	// 记录时间
+	t0 := time.Now()
+
+	// 并行分词
+	for i := 0; i < numRuns; i++ {
+		for _, l := range lines {
+			task <- l
+		}
+	}
+
+	// 记录时间并计算分词速度
+	t1 := time.Now()
+	log.Printf("分词花费时间 %v", t1.Sub(t0))
+	log.Printf("分词速度 %f MB/s", float64(size*numRuns)/t1.Sub(t0).Seconds()/(1024*1024))
+}
