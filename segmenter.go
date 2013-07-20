@@ -93,90 +93,70 @@ func (seg *Segmenter) LoadDictionary(files string) {
 // 输出：
 //	[]Segment	划分的分词
 func (seg *Segmenter) Segment(bytes []byte) []Segment {
-	// 划分字元
-	text := splitTextToWords(bytes)
-	outputSegments := make([]Segment, len(text))
-
 	// 处理特殊情况
-	if len(text) == 0 {
-		return outputSegments
+	if len(bytes) == 0 {
+		return []Segment{}
 	}
 
-	// jumpers定义了每个字元处的向前跳转信息，包括这个跳转对应的分词，以及从文本段开始到该字元的最短路径值
+	// 划分字元
+	text := splitTextToWords(bytes)
+
+	// jumpers定义了每个字元处的向前跳转信息，包括这个跳转对应的分词，
+	// 以及从文本段开始到该字元的最短路径值
 	jumpers := make([]Jumper, len(text))
-	jumpers[0] = Jumper{0, nil}
 
-	start := 0
-	current := start
-	currentSeg := 0
 	tokens := make([]*Token, seg.dict.maxTokenLength)
-	for current < len(text) {
-		max := start
-		for current = start; current < len(text); current++ {
-			// 在前一个字元处所有路径汇聚了，这表明前段文本已经完成动态搜索得到最短路径，此时跳出循环
-			if current > max {
-				break
-			}
-
-			// 找到前一个字元处的最短路径，以便计算后续路径值
-			var baseDistance float32
-			if current == start {
-				// 当本字元在文本首部时，基础距离应该是零
-				baseDistance = 0
-			} else {
-				baseDistance = jumpers[current-1].token.distance
-			}
-
-			// 寻找所有以当前字元开头的分词
-			numTokens := seg.dict.lookupTokens(
-				text[current:minInt(current+seg.dict.maxTokenLength, len(text))], tokens)
-
-			// 对所有可能的分词，更新分词结束字元处的跳转信息
-			for iToken := 0; iToken < numTokens; iToken++ {
-				location := current + len(tokens[iToken].text) - 1
-				updateJumper(&jumpers[location], baseDistance, tokens[iToken])
-
-				// 更新这段文本所能覆盖的最远位置
-				max = maxInt(max, current+len(tokens[iToken].text)-1)
-			}
-
-			// 当前字元没有对应分词时补加一个伪分词
-			if numTokens == 0 || len(tokens[0].text) > 1 {
-				updateJumper(&jumpers[current], baseDistance,
-					&Token{text: []Text{text[current]}, frequency: 1, distance: 32, pos: "x"})
-				max = maxInt(max, current)
-			}
+	for current := 0; current < len(text); current++ {
+		// 找到前一个字元处的最短路径，以便计算后续路径值
+		var baseDistance float32
+		if current == 0 {
+			// 当本字元在文本首部时，基础距离应该是零
+			baseDistance = 0
+		} else {
+			baseDistance = jumpers[current-1].minDistance
 		}
 
-		// 从后向前扫描第一遍得到需要添加的分词数目
-		numSeg := 0
-		for index := max; index >= start; {
-			location := index - len(jumpers[index].token.text) + 1
-			numSeg++
-			index = location - 1
-		}
-		oldNumSeg := numSeg
+		// 寻找所有以当前字元开头的分词
+		numTokens := seg.dict.lookupTokens(
+			text[current:minInt(current+seg.dict.maxTokenLength, len(text))], tokens)
 
-		// 从后向前扫描第二遍添加分词到最终结果
-		for index := max; index >= start; {
-			location := index - len(jumpers[index].token.text) + 1
-			numSeg--
-			outputSegments[currentSeg+numSeg] = Segment{Position: 0, Token: jumpers[index].token}
-			index = location - 1
+		// 对所有可能的分词，更新分词结束字元处的跳转信息
+		for iToken := 0; iToken < numTokens; iToken++ {
+			location := current + len(tokens[iToken].text) - 1
+			updateJumper(&jumpers[location], baseDistance, tokens[iToken])
 		}
-		currentSeg += oldNumSeg
 
-		// 开始下一段文本
-		start = max + 1
+		// 当前字元没有对应分词时补加一个伪分词
+		if numTokens == 0 || len(tokens[0].text) > 1 {
+			updateJumper(&jumpers[current], baseDistance,
+				&Token{text: []Text{text[current]}, frequency: 1, distance: 32, pos: "x"})
+		}
+	}
+
+	// 从后向前扫描第一遍得到需要添加的分词数目
+	numSeg := 0
+	for index := len(text) - 1; index >= 0; {
+		location := index - len(jumpers[index].token.text) + 1
+		numSeg++
+		index = location - 1
+	}
+
+	// 从后向前扫描第二遍添加分词到最终结果
+	outputSegments := make([]Segment, numSeg)
+	for index := len(text) - 1; index >= 0; {
+		location := index - len(jumpers[index].token.text) + 1
+		numSeg--
+		outputSegments[numSeg].Token = jumpers[index].token
+		index = location - 1
 	}
 
 	// 计算各个分词的字节位置
 	bytePosition := 0
-	for iSeg := 0; iSeg < currentSeg; iSeg++ {
+	for iSeg := 0; iSeg < len(outputSegments); iSeg++ {
 		outputSegments[iSeg].Position = bytePosition
 		bytePosition += TextSliceByteLength(outputSegments[iSeg].Token.text)
 	}
-	return outputSegments[:currentSeg]
+	return outputSegments
 }
 
 // 更新跳转信息:

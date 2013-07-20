@@ -4,6 +4,20 @@ import (
 	"testing"
 )
 
+func TestSplit(t *testing.T) {
+	expect(t, "中/国/有/十/三/亿/人/口/",
+		bytesToString(splitTextToWords([]byte(
+			"中国有十三亿人口"))))
+
+	expect(t, "github/ /is/ /a/ /web/-/based/ /hosting/ /service/ /for/ /software/ /development/ /projects/",
+		bytesToString(splitTextToWords([]byte(
+			"GitHub is a web-based hosting service for software development projects"))))
+
+	expect(t, "中/国/雅/虎/yahoo/!/ /china/致/力/于/领/先/的/公/益/民/生/门/户/网/站/",
+		bytesToString(splitTextToWords([]byte(
+			"中国雅虎Yahoo! China致力于领先的公益民生门户网站"))))
+}
+
 func TestSegment(t *testing.T) {
 	var seg Segmenter
 	seg.LoadDictionary("testdata/test_dict1.txt,testdata/test_dict2.txt")
@@ -17,17 +31,9 @@ func TestSegment(t *testing.T) {
 	expect(t, "18", segments[3].Position)
 }
 
-func TestSplit(t *testing.T) {
-	expect(t, "中/国/有/十/三/亿/人/口/",
-		bytesToString(splitTextToWords([]byte(
-			"中国有十三亿人口"))))
-
-	expect(t, "github/ /is/ /a/ /web/-/based/ /hosting/ /service/ /for/ /software/ /development/ /projects/",
-		bytesToString(splitTextToWords([]byte(
-			"GitHub is a web-based hosting service for software development projects"))))
-
-	expect(t, "中/国/雅/虎/yahoo/!/ /china/致/力/于/领/先/的/公/益/民/生/门/户/网/站/",
-		bytesToString(splitTextToWords([]byte(
-			"中国雅虎Yahoo! China致力于领先的公益民生门户网站"))))
-
+func TestLargeDictionary(t *testing.T) {
+	var seg Segmenter
+	seg.LoadDictionary("data/dictionary.txt")
+	expect(t, "中国/ns 人口/n", SegmentsToString(seg.Segment(
+		[]byte("中国人口"))))
 }
