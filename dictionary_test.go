@@ -6,12 +6,12 @@ import (
 )
 
 func TestBinarySort(t *testing.T) {
-	e := []*Node{
-		&Node{word: []byte("2")},
-		&Node{word: []byte("3")},
-		&Node{word: []byte("4")},
-		&Node{word: []byte("7")},
-		&Node{word: []byte("8")}}
+	e := []*node{
+		&node{word: []byte("2")},
+		&node{word: []byte("3")},
+		&node{word: []byte("4")},
+		&node{word: []byte("7")},
+		&node{word: []byte("8")}}
 	expect(t, "0 false", fmt.Sprint(binarySearch(e, []byte("1"))))
 	expect(t, "0 true", fmt.Sprint(binarySearch(e, []byte("2"))))
 	expect(t, "1 true", fmt.Sprint(binarySearch(e, []byte("3"))))
@@ -23,12 +23,12 @@ func TestBinarySort(t *testing.T) {
 }
 
 func TestUnsert(t *testing.T) {
-	e := []*Node{
-		&Node{word: []byte("2")},
-		&Node{word: []byte("3")},
-		&Node{word: []byte("4")},
-		&Node{word: []byte("7")},
-		&Node{word: []byte("8")}}
+	e := []*node{
+		&node{word: []byte("2")},
+		&node{word: []byte("3")},
+		&node{word: []byte("4")},
+		&node{word: []byte("7")},
+		&node{word: []byte("8")}}
 	upsert(&e, []byte("1"))
 	expect(t, "1 2 3 4 7 8 ", printNodes(e))
 	upsert(&e, []byte("2"))
