@@ -80,7 +80,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		token.distance = logTotalFrequency - float32(math.Log2(float64(token.frequency)))
 	}
 
-	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体中tokens变量的注释。
+	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体的注释。
 	for _, token := range seg.dict.tokens {
 		segments := seg.segmentWords(token.text, true)
 
