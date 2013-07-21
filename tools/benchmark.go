@@ -111,7 +111,7 @@ func main() {
 	for _, l := range lines {
 		segments := segmenter.Segment(l)
 		if *output != "" {
-			of.WriteString(sego.SegmentsToString(segments))
+			of.WriteString(sego.SegmentsToString(segments, false))
 			of.WriteString("\n")
 		}
 	}

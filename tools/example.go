@@ -17,5 +17,5 @@ func main() {
 	seg.LoadDictionary("../data/dictionary.txt")
 
 	segments := seg.Segment([]byte(*text))
-	fmt.Println(sego.SegmentsToString(segments))
+	fmt.Println(sego.SegmentsToString(segments, true))
 }

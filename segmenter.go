@@ -40,7 +40,7 @@ type Jumper struct {
 // 	"用户词典.txt,通用词典.txt"
 // 当一个分词既出现在用户词典也出现在通用词典中，则优先使用用户词典。
 //
-// 词典的格式为（每个分词一行）
+// 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
 func (seg *Segmenter) LoadDictionary(files string) {
 	for _, file := range strings.Split(files, ",") {
@@ -82,6 +82,32 @@ func (seg *Segmenter) LoadDictionary(files string) {
 	for _, token := range seg.dict.tokens {
 		token.distance = logTotalFrequency - float32(math.Log2(float64(token.frequency)))
 	}
+
+	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体中tokens变量的注释。
+	for _, token := range seg.dict.tokens {
+		segments := seg.segmentWords(token.text, true)
+
+		// 计算需要添加的子分词数目
+		numTokensToAdd := 0
+		for iToken := 0; iToken < len(segments); iToken++ {
+			if len(segments[iToken].Token.text) > 1 {
+				// 略去字元长度为一的分词
+				// TODO: 这值得进一步推敲，特别是当字典中有英文复合词的时候
+				numTokensToAdd++
+			}
+		}
+		token.tokens = make([]*Token, numTokensToAdd)
+
+		// 添加子分词
+		iTokenToAdd := 0
+		for iToken := 0; iToken < len(segments); iToken++ {
+			if len(segments[iToken].Token.text) > 1 {
+				token.tokens[iTokenToAdd] = segments[iTokenToAdd].Token
+				iTokenToAdd++
+			}
+		}
+	}
+
 	log.Println("sego词典载入完毕")
 }
 
@@ -93,6 +119,10 @@ func (seg *Segmenter) LoadDictionary(files string) {
 // 输出：
 //	[]Segment	划分的分词
 func (seg *Segmenter) Segment(bytes []byte) []Segment {
+	return seg.internalSegment(bytes, false)
+}
+
+func (seg *Segmenter) internalSegment(bytes []byte, searchMode bool) []Segment {
 	// 处理特殊情况
 	if len(bytes) == 0 {
 		return []Segment{}
@@ -100,6 +130,15 @@ func (seg *Segmenter) Segment(bytes []byte) []Segment {
 
 	// 划分字元
 	text := splitTextToWords(bytes)
+
+	return seg.segmentWords(text, searchMode)
+}
+
+func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
+	// 搜索模式下该分词已无继续划分可能的情况
+	if searchMode && len(text) == 1 {
+		return []Segment{}
+	}
 
 	// jumpers定义了每个字元处的向前跳转信息，包括这个跳转对应的分词，
 	// 以及从文本段开始到该字元的最短路径值
@@ -123,7 +162,9 @@ func (seg *Segmenter) Segment(bytes []byte) []Segment {
 		// 对所有可能的分词，更新分词结束字元处的跳转信息
 		for iToken := 0; iToken < numTokens; iToken++ {
 			location := current + len(tokens[iToken].text) - 1
-			updateJumper(&jumpers[location], baseDistance, tokens[iToken])
+			if !searchMode || current != 0 || location != len(text)-1 {
+				updateJumper(&jumpers[location], baseDistance, tokens[iToken])
+			}
 		}
 
 		// 当前字元没有对应分词时补加一个伪分词
@@ -154,7 +195,7 @@ func (seg *Segmenter) Segment(bytes []byte) []Segment {
 	bytePosition := 0
 	for iSeg := 0; iSeg < len(outputSegments); iSeg++ {
 		outputSegments[iSeg].Position = bytePosition
-		bytePosition += TextSliceByteLength(outputSegments[iSeg].Token.text)
+		bytePosition += textSliceByteLength(outputSegments[iSeg].Token.text)
 	}
 	return outputSegments
 }
