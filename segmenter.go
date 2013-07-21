@@ -19,18 +19,6 @@ type Segmenter struct {
 	dict *Dictionary
 }
 
-// 文本中的一个分词
-type Segment struct {
-	// 分词在文本中的起始字节位置
-	Start int
-
-	// 分词在文本中的起始字节位置（不包括该位置）
-	End int
-
-	// 分词信息
-	Token *Token
-}
-
 // 该结构体用于记录Viterbi算法中某字元处的向前分词跳转信息
 type jumper struct {
 	minDistance float32
@@ -99,20 +87,20 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		// 计算需要添加的子分词数目
 		numTokensToAdd := 0
 		for iToken := 0; iToken < len(segments); iToken++ {
-			if len(segments[iToken].Token.text) > 1 {
+			if len(segments[iToken].token.text) > 1 {
 				// 略去字元长度为一的分词
 				// TODO: 这值得进一步推敲，特别是当字典中有英文复合词的时候
 				numTokensToAdd++
 			}
 		}
-		token.tokens = make([]*Token, numTokensToAdd)
+		token.segments = make([]*Segment, numTokensToAdd)
 
 		// 添加子分词
-		iTokenToAdd := 0
+		iSegmentsToAdd := 0
 		for iToken := 0; iToken < len(segments); iToken++ {
-			if len(segments[iToken].Token.text) > 1 {
-				token.tokens[iTokenToAdd] = segments[iTokenToAdd].Token
-				iTokenToAdd++
+			if len(segments[iToken].token.text) > 1 {
+				token.segments[iSegmentsToAdd] = &segments[iSegmentsToAdd]
+				iSegmentsToAdd++
 			}
 		}
 	}
@@ -196,16 +184,16 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 	for index := len(text) - 1; index >= 0; {
 		location := index - len(jumpers[index].token.text) + 1
 		numSeg--
-		outputSegments[numSeg].Token = jumpers[index].token
+		outputSegments[numSeg].token = jumpers[index].token
 		index = location - 1
 	}
 
 	// 计算各个分词的字节位置
 	bytePosition := 0
 	for iSeg := 0; iSeg < len(outputSegments); iSeg++ {
-		outputSegments[iSeg].Start = bytePosition
-		bytePosition += textSliceByteLength(outputSegments[iSeg].Token.text)
-		outputSegments[iSeg].End = bytePosition
+		outputSegments[iSeg].start = bytePosition
+		bytePosition += textSliceByteLength(outputSegments[iSeg].token.text)
+		outputSegments[iSeg].end = bytePosition
 	}
 	return outputSegments
 }

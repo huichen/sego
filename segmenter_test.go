@@ -29,14 +29,14 @@ func TestSegment(t *testing.T) {
 	segments := seg.Segment([]byte("中国有十三亿人口"))
 	expect(t, "中国/p8 有/p3 十三亿/p11 人口/p12 ", SegmentsToString(segments, false))
 	expect(t, "4", len(segments))
-	expect(t, "0", segments[0].Start)
-	expect(t, "6", segments[0].End)
-	expect(t, "6", segments[1].Start)
-	expect(t, "9", segments[1].End)
-	expect(t, "9", segments[2].Start)
-	expect(t, "18", segments[2].End)
-	expect(t, "18", segments[3].Start)
-	expect(t, "24", segments[3].End)
+	expect(t, "0", segments[0].start)
+	expect(t, "6", segments[0].end)
+	expect(t, "6", segments[1].start)
+	expect(t, "9", segments[1].end)
+	expect(t, "9", segments[2].start)
+	expect(t, "18", segments[2].end)
+	expect(t, "18", segments[3].start)
+	expect(t, "24", segments[3].end)
 }
 
 func TestLargeDictionary(t *testing.T) {

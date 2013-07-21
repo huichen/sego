@@ -16,20 +16,20 @@ import (
 func SegmentsToString(segs []Segment, searchMode bool) (output string) {
 	if searchMode {
 		for _, seg := range segs {
-			output += tokenToString(seg.Token)
+			output += tokenToString(seg.token)
 		}
 	} else {
 		for _, seg := range segs {
 			output += fmt.Sprintf(
-				"%s/%s ", textSliceToString(seg.Token.text), seg.Token.pos)
+				"%s/%s ", textSliceToString(seg.token.text), seg.token.pos)
 		}
 	}
 	return
 }
 
 func tokenToString(token *Token) (output string) {
-	for _, t := range token.tokens {
-		output += tokenToString(t)
+	for _, s := range token.segments {
+		output += tokenToString(s.token)
 	}
 	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.pos)
 	return

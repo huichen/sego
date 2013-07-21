@@ -22,8 +22,8 @@ type Token struct {
 	// 词性标注
 	pos string
 
-	// 该分词文本的进一步分词划分，见Tokens函数注释。
-	tokens []*Token
+	// 该分词文本的进一步分词划分，见Segments函数注释。
+	segments []*Segment
 }
 
 // 返回分词文本
@@ -45,6 +45,6 @@ func (token *Token) Pos() string {
 // 有两个子分词"中华人民共和国"和"中央人民政府"。子分词也可以进一步有子分词
 // 形成一个树结构，遍历这个树就可以得到该分词的所有细致分词划分，这主要
 // 用于搜索引擎对一段文本进行全文搜索。
-func (token *Token) Tokens() []*Token {
-	return token.tokens
+func (token *Token) Segments() []*Segment {
+	return token.segments
 }
