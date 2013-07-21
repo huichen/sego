@@ -16,22 +16,30 @@ const (
 
 // 分词器结构体
 type Segmenter struct {
-	dict Dictionary
+	dict *Dictionary
 }
 
 // 文本中的一个分词
 type Segment struct {
 	// 分词在文本中的起始字节位置
-	Position int
+	Start int
+
+	// 分词在文本中的起始字节位置（不包括该位置）
+	End int
 
 	// 分词信息
 	Token *Token
 }
 
 // 该结构体用于记录Viterbi算法中某字元处的向前分词跳转信息
-type Jumper struct {
+type jumper struct {
 	minDistance float32
 	token       *Token
+}
+
+// 返回分词器使用的词典
+func (seg *Segmenter) Dictionary() *Dictionary {
+	return seg.dict
 }
 
 // 从文件中载入词典
@@ -43,6 +51,7 @@ type Jumper struct {
 // 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
 func (seg *Segmenter) LoadDictionary(files string) {
+	seg.dict = new(Dictionary)
 	for _, file := range strings.Split(files, ",") {
 		log.Printf("载入sego词典 %s", file)
 		dictFile, err := os.Open(file)
@@ -142,7 +151,7 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 
 	// jumpers定义了每个字元处的向前跳转信息，包括这个跳转对应的分词，
 	// 以及从文本段开始到该字元的最短路径值
-	jumpers := make([]Jumper, len(text))
+	jumpers := make([]jumper, len(text))
 
 	tokens := make([]*Token, seg.dict.maxTokenLength)
 	for current := 0; current < len(text); current++ {
@@ -194,8 +203,9 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 	// 计算各个分词的字节位置
 	bytePosition := 0
 	for iSeg := 0; iSeg < len(outputSegments); iSeg++ {
-		outputSegments[iSeg].Position = bytePosition
+		outputSegments[iSeg].Start = bytePosition
 		bytePosition += textSliceByteLength(outputSegments[iSeg].Token.text)
+		outputSegments[iSeg].End = bytePosition
 	}
 	return outputSegments
 }
@@ -204,7 +214,7 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 // 	1. 当该位置从未被访问过时(jumper.minDistance为零的情况)，或者
 //	2. 当该位置的当前最短路径大于新的最短路径时
 // 将当前位置的最短路径值更新为baseDistance加上新分词的概率
-func updateJumper(jumper *Jumper, baseDistance float32, token *Token) {
+func updateJumper(jumper *jumper, baseDistance float32, token *Token) {
 	newDistance := baseDistance + token.distance
 	if jumper.minDistance == 0 || jumper.minDistance > newDistance {
 		jumper.minDistance = newDistance

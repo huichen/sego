@@ -6,7 +6,7 @@ import (
 
 // Dictionary结构体实现了一个字串前缀树，一个分词可能出现在叶子节点也有可能出现在非叶节点
 type Dictionary struct {
-	root           Node     // 根节点
+	root           node     // 根节点
 	maxTokenLength int      // 词典中最长的分词
 	numTokens      int      // 词典中分词数目
 	tokens         []*Token // 词典中所有的分词，方便遍历
@@ -14,10 +14,25 @@ type Dictionary struct {
 }
 
 // 前缀树节点
-type Node struct {
+type node struct {
 	word     Text    // 该节点对应的字元
 	token    *Token  // 当此节点没有对应的分词时值为nil
-	children []*Node // 该字元后继的所有可能字元，当为叶子节点时为空
+	children []*node // 该字元后继的所有可能字元，当为叶子节点时为空
+}
+
+// 词典中最长的分词
+func (dict *Dictionary) MaxTokenLength() int {
+	return dict.maxTokenLength
+}
+
+// 词典中分词数目
+func (dict *Dictionary) NumTokens() int {
+	return dict.numTokens
+}
+
+// 词典中所有分词的频率之和
+func (dict *Dictionary) TotalFrequency() int64 {
+	return dict.totalFrequency
 }
 
 // 向词典中加入一个分词
@@ -75,7 +90,7 @@ func (dict *Dictionary) lookupTokens(words []Text, tokens []*Token) int {
 // 二分法查找字元在子节点中的位置
 // 如果查找成功，第一个返回参数为找到的位置，第二个返回参数为true
 // 如果查找失败，第一个返回参数为应当插入的位置，第二个返回参数false
-func binarySearch(nodes []*Node, word Text) (int, bool) {
+func binarySearch(nodes []*node, word Text) (int, bool) {
 	start := 0
 	end := len(nodes) - 1
 
@@ -120,13 +135,13 @@ func binarySearch(nodes []*Node, word Text) (int, bool) {
 
 // 将字元加入节点数组中，并返回插入的节点指针
 // 如果字元已经存在则返回存在的节点指针
-func upsert(nodes *[]*Node, word Text) *Node {
+func upsert(nodes *[]*node, word Text) *node {
 	index, found := binarySearch(*nodes, word)
 	if found {
 		return (*nodes)[index]
 	}
 	*nodes = append(*nodes, nil)
 	copy((*nodes)[index+1:], (*nodes)[index:])
-	(*nodes)[index] = &Node{word: word}
+	(*nodes)[index] = &node{word: word}
 	return (*nodes)[index]
 }

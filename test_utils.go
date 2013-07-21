@@ -12,14 +12,14 @@ func expect(t *testing.T, expect string, actual interface{}) {
 	}
 }
 
-func printNodes(nodes []*Node) (output string) {
+func printNodes(nodes []*node) (output string) {
 	for _, node := range nodes {
 		output += fmt.Sprintf("%s ", node.word)
 	}
 	return
 }
 
-func getNodeString(node *Node) string {
+func getNodeString(node *node) string {
 	output := string(node.word)
 	if node.token != nil {
 		output += "."
