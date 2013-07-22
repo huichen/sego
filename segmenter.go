@@ -1,4 +1,4 @@
-//Go语言实现的中文分词程序
+//Go中文分词
 package sego
 
 import (
