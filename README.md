@@ -1,7 +1,7 @@
 sego
 ====
 
-Go语言实现的中文分词程序
+Go中文分词
 
 <a href="https://github.com/huichen/sego/blob/master/dictionary.go">词典</a>用前缀树实现，
 <a href="https://github.com/huichen/sego/blob/master/segmenter.go">分词器</a>算法为最短路径加动态规划。
