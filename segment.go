@@ -5,7 +5,7 @@ type Segment struct {
 	// 分词在文本中的起始字节位置
 	start int
 
-	// 分词在文本中的起始字节位置（不包括该位置）
+	// 分词在文本中的结束字节位置（不包括该位置）
 	end int
 
 	// 分词信息
@@ -17,7 +17,7 @@ func (s *Segment) Start() int {
 	return s.start
 }
 
-// 返回分词在文本中的起始字节位置（不包括该位置）
+// 返回分词在文本中的结束字节位置（不包括该位置）
 func (s *Segment) End() int {
 	return s.end
 }
