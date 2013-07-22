@@ -4,7 +4,7 @@ sego
 Go中文分词
 
 <a href="https://github.com/huichen/sego/blob/master/dictionary.go">词典</a>用前缀树实现，
-<a href="https://github.com/huichen/sego/blob/master/segmenter.go">分词器</a>算法为最短路径加动态规划。
+<a href="https://github.com/huichen/sego/blob/master/segmenter.go">分词器</a>算法为基于词频的最短路径加动态规划。
 
 支持普通和搜索引擎两种分词模式，支持用户词典、词性标注，可运行<a href="https://github.com/huichen/sego/blob/master/server/server.go">JSON RPC服务</a>。
 
