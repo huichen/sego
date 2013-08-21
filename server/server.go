@@ -71,6 +71,8 @@ func JsonRpcServer(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	flag.Parse()
+
 	// 将线程数设置为CPU数
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
