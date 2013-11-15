@@ -13,11 +13,11 @@ func TestSplit(t *testing.T) {
 		bytesToString(splitTextToWords([]byte(
 			"中国有十三亿人口"))))
 
-	expect(t, "github/ /is/ /a/ /web/-/based/ /hosting/ /service/ /for/ /software/ /development/ /projects/",
+	expect(t, "github/ /is/ /a/ /web-based/ /hosting/ /service/ /for/ /software/ /development/ /projects/",
 		bytesToString(splitTextToWords([]byte(
 			"GitHub is a web-based hosting service for software development projects"))))
 
-	expect(t, "中/国/雅/虎/yahoo/!/ /china/致/力/于/领/先/的/公/益/民/生/门/户/网/站/",
+	expect(t, "中/国/雅/虎/yahoo!/ /china/致/力/于/领/先/的/公/益/民/生/门/户/网/站/",
 		bytesToString(splitTextToWords([]byte(
 			"中国雅虎Yahoo! China致力于领先的公益民生门户网站"))))
 }
