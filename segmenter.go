@@ -236,7 +236,7 @@ func splitTextToWords(text Text) []Text {
 	alphanumericStart := 0
 	for current < len(text) {
 		r, size := utf8.DecodeRune(text[current:])
-		if size == 1 && r != ' ' {
+		if size <= 2 && r != ' ' {
 			// 当前是英文字母或者数字
 			if !inAlphanumeric {
 				alphanumericStart = current
