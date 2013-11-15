@@ -13,36 +13,26 @@ func TestSplit(t *testing.T) {
 		bytesToString(splitTextToWords([]byte(
 			"中国有十三亿人口"))))
 
-	expect(t, "github/ /is/ /a/ /web-based/ /hosting/ /service/ /for/ /software/ /development/ /projects/",
+	expect(t, "github/ /is/ /a/ /web/-/based/ /hosting/ /service/,/ /for/ /software/ /development/ /projects/./",
 		bytesToString(splitTextToWords([]byte(
-			"GitHub is a web-based hosting service for software development projects"))))
+			"GitHub is a web-based hosting service, for software development projects."))))
 
-	expect(t, "中/国/雅/虎/yahoo!/ /china/致/力/于/领/先/的/公/益/民/生/门/户/网/站/",
+	expect(t, "中/国/雅/虎/yahoo/!/ /china/致/力/于/，/领/先/的/公/益/民/生/门/户/网/站/。/",
 		bytesToString(splitTextToWords([]byte(
-			"中国雅虎Yahoo! China致力于领先的公益民生门户网站"))))
+			"中国雅虎Yahoo! China致力于，领先的公益民生门户网站。"))))
 
-	expect(t, "こ/ん/に/ち/は/",
-		bytesToString(splitTextToWords([]byte(
-			"こんにちは"))))
+	expect(t, "こ/ん/に/ち/は/", bytesToString(splitTextToWords([]byte("こんにちは"))))
 
-	expect(t, "안/녕/하/세/요/",
-		bytesToString(splitTextToWords([]byte(
-			"안녕하세요"))))
+	expect(t, "안/녕/하/세/요/", bytesToString(splitTextToWords([]byte("안녕하세요"))))
 
-	expect(t, "Я/ /тоже/ /рада/ /Вас/ /видеть/",
-		bytesToString(splitTextToWords([]byte(
-			"Я тоже рада Вас видеть"))))
+	expect(t, "Я/ /тоже/ /рада/ /Вас/ /видеть/", bytesToString(splitTextToWords([]byte("Я тоже рада Вас видеть"))))
+
+	expect(t, "¿/cómo/ /van/ /las/ /cosas/", bytesToString(splitTextToWords([]byte("¿Cómo van las cosas"))))
+
+	expect(t, "wie/ /geht/ /es/ /ihnen/", bytesToString(splitTextToWords([]byte("Wie geht es Ihnen"))))
 
 	expect(t, "je/ /suis/ /enchanté/ /de/ /cette/ /pièce/",
-		bytesToString(splitTextToWords([]byte(
-			"Je suis enchanté de cette pièce"))))
-	expect(t, "¿cómo/ /van/ /las/ /cosas/",
-		bytesToString(splitTextToWords([]byte(
-			"¿Cómo van las cosas"))))
-
-	expect(t, "wie/ /geht/ /es/ /ihnen/",
-		bytesToString(splitTextToWords([]byte(
-			"Wie geht es Ihnen"))))
+		bytesToString(splitTextToWords([]byte("Je suis enchanté de cette pièce"))))
 }
 
 func TestSegment(t *testing.T) {
