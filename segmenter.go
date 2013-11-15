@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -235,11 +236,8 @@ func splitTextToWords(text Text) []Text {
 	inAlphanumeric := true
 	alphanumericStart := 0
 	for current < len(text) {
-		_, size := utf8.DecodeRune(text[current:])
-		if size == 1 &&
-			(text[current] >= 'a' && text[current] <= 'z') ||
-			(text[current] >= 'A' && text[current] <= 'Z') ||
-			(text[current] >= '0' && text[current] <= '9') {
+		r, size := utf8.DecodeRune(text[current:])
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
 			// 当前是英文字母或者数字
 			if !inAlphanumeric {
 				alphanumericStart = current
