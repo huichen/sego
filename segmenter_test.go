@@ -40,7 +40,7 @@ func TestSegment(t *testing.T) {
 	seg.LoadDictionary("testdata/test_dict1.txt,testdata/test_dict2.txt")
 	expect(t, "12", seg.dict.numTokens)
 	segments := seg.Segment([]byte("中国有十三亿人口"))
-	expect(t, "中国/p8 有/p3 十三亿/p11 人口/p12 ", SegmentsToString(segments, false))
+	expect(t, "中国/ 有/p3 十三亿/ 人口/p12 ", SegmentsToString(segments, false))
 	expect(t, "4", len(segments))
 	expect(t, "0", segments[0].start)
 	expect(t, "6", segments[0].end)

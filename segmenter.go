@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -52,16 +53,30 @@ func (seg *Segmenter) LoadDictionary(files string) {
 
 		reader := bufio.NewReader(dictFile)
 		var text string
+		var freqText string
 		var frequency int
 		var pos string
 
 		// 逐行读入分词
 		for {
-			size, _ := fmt.Fscanf(reader, "%s %d %s\n", &text, &frequency, &pos)
+			size, _ := fmt.Fscanln(reader, &text, &freqText, &pos)
 
-			// 文件结束
 			if size == 0 {
+				// 文件结束
 				break
+			} else if size < 2 {
+				// 无效行
+				continue
+			} else if size == 2 {
+				// 没有词性标注时设为空字符串
+				pos = ""
+			}
+
+			// 解析词频
+			var err error
+			frequency, err = strconv.Atoi(freqText)
+			if err != nil {
+				continue
 			}
 
 			// 过滤频率太小的词
