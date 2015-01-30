@@ -63,6 +63,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 
 			if size == 0 {
 				// 文件结束
+				log.Println("文件结束")
 				break
 			} else if size < 2 {
 				// 无效行
