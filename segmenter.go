@@ -4,10 +4,10 @@ package sego
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"os"
-	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -53,31 +53,33 @@ func (seg *Segmenter) LoadDictionary(files string) {
 
 		reader := bufio.NewReader(dictFile)
 		var text string
-		var freqText string
 		var frequency int
 		var pos string
 
 		// 逐行读入分词
 		for {
-			size, _ := fmt.Fscanln(reader, &text, &freqText, &pos)
-
-			if size == 0 {
-				// 文件结束
-				log.Println("文件结束")
-				break
-			} else if size < 2 {
-				// 无效行
-				continue
-			} else if size == 2 {
-				// 没有词性标注时设为空字符串
-				pos = ""
-			}
-
 			// 解析词频
 			var err error
-			frequency, err = strconv.Atoi(freqText)
+
+			size, err := fmt.Fscanln(reader, &text, &frequency, &pos)
+
 			if err != nil {
+				if err == io.EOF {
+					// 文件结束
+					break
+				}
+				// 无效行
 				continue
+			}
+
+			if size < 2 {
+				// 无效行
+				continue
+			}
+
+			if size == 2 {
+				// 没有词性标注时设为空字符串
+				pos = ""
 			}
 
 			// 过滤频率太小的词
