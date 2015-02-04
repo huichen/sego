@@ -3,11 +3,12 @@ package sego
 
 import (
 	"bufio"
-	"fmt"
+	"errors"
 	"io"
 	"log"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -61,24 +62,25 @@ func (seg *Segmenter) LoadDictionary(files string) error {
 		line := 0
 		for {
 			line++
-			reader.ReadLine()
-			size, err := fmt.Fscanln(reader, &text, &frequency, &pos)
-
+			txt, err := reader.ReadString('\n')
 			if err != nil {
 				if err == io.EOF {
 					// 文件结束
 					break
 				}
 				log.Printf("%v 文件第 %v行读取错误,跳过: %v", file, line, err.Error())
-				// 无效行
 				continue
 			}
 
-			if size < 3 {
-				// 无效行
-				log.Printf("%v 文件第 %v行读取错误,跳过: %v", file, line, "读取个数少于两个")
+			parts := strings.Split(txt, " ")
+			if len(parts) < 3 {
+				log.Printf("%v 文件第 %v行读取错误,跳过: %v", file, line, "读取个数少于三个")
 				continue
 			}
+			N := len(parts)
+			text = strings.Join(parts[:N-2], " ")
+			frequency, err = strconv.Atoi(parts[N-2])
+			pos = parts[N-1]
 
 			// 过滤频率太小的词
 			if frequency < minTokenFrequency {
@@ -125,6 +127,18 @@ func (seg *Segmenter) LoadDictionary(files string) error {
 
 	log.Println("sego词典载入完毕")
 	return nil
+}
+
+func parse(line string) (txt string, prequence int, pos string, err error) {
+	parts := strings.Split(line, " ")
+	if len(parts) < 3 {
+		return "", 0, "", errors.New("incomplete line")
+	}
+	N := len(parts)
+	txt = strings.Join(parts[:N-2], " ")
+	prequence, err = strconv.Atoi(parts[N-2])
+	pos = parts[N-1]
+	return
 }
 
 // 对文本分词
