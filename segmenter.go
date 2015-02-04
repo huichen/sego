@@ -40,15 +40,16 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 // 当一个分词既出现在用户词典也出现在通用词典中，则优先使用用户词典。
 //
 // 词典的格式为（每个分词一行）：
-//	分词文本 频率 词性
-func (seg *Segmenter) LoadDictionary(files string) {
+//	分词文本 频率 词性  (强制要求使用这个格式，不符合这个格式的行跳过，并且在log中可以看到)
+func (seg *Segmenter) LoadDictionary(files string) error {
 	seg.dict = new(Dictionary)
 	for _, file := range strings.Split(files, ",") {
 		log.Printf("载入sego词典 %s", file)
 		dictFile, err := os.Open(file)
 		defer dictFile.Close()
 		if err != nil {
-			log.Fatalf("无法载入字典文件 \"%s\" \n", file)
+			log.Printf("无法载入字典文件 \"%s\" \n", file)
+			return err
 		}
 
 		reader := bufio.NewReader(dictFile)
@@ -57,10 +58,10 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		var pos string
 
 		// 逐行读入分词
+		line := 0
 		for {
-			// 解析词频
-			var err error
-
+			line++
+			reader.ReadLine()
 			size, err := fmt.Fscanln(reader, &text, &frequency, &pos)
 
 			if err != nil {
@@ -68,18 +69,15 @@ func (seg *Segmenter) LoadDictionary(files string) {
 					// 文件结束
 					break
 				}
+				log.Printf("%v 文件第 %v行读取错误,跳过: %v", file, line, err.Error())
 				// 无效行
 				continue
 			}
 
-			if size < 2 {
+			if size < 3 {
 				// 无效行
+				log.Printf("%v 文件第 %v行读取错误,跳过: %v", file, line, "读取个数少于两个")
 				continue
-			}
-
-			if size == 2 {
-				// 没有词性标注时设为空字符串
-				pos = ""
 			}
 
 			// 过滤频率太小的词
@@ -126,6 +124,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 	}
 
 	log.Println("sego词典载入完毕")
+	return nil
 }
 
 // 对文本分词
