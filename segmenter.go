@@ -18,6 +18,42 @@ const (
 	minTokenFrequency = 2 // 仅从字典文件中读取大于等于此频率的分词
 )
 
+var DefaultSegmenter = new(Segmenter)
+
+var segmenters = map[string]*Segmenter{
+	"default": DefaultSegmenter,
+}
+
+// 注册分词器
+func RegisterSegmenter(alias string, files string) error {
+	seg := new(Segmenter)
+	err := seg.LoadDictionary(files)
+	if err != nil {
+		return err
+	}
+
+	segmenters[alias] = seg
+	return nil
+}
+
+// 获取分词器
+func GetSegmenter(alias string) *Segmenter {
+	if _, ok := segmenters[alias]; ok {
+		return segmenters[alias]
+	}
+	return nil
+}
+
+// 注册默认分词器
+func RegisterDefaultSegmenter(files string) error {
+	return RegisterSegmenter("default", files)
+}
+
+// 获取默认分词器
+func GetDefaultSegmenter() *Segmenter {
+	return GetSegmenter("default")
+}
+
 // 分词器结构体
 type Segmenter struct {
 	dict *Dictionary
