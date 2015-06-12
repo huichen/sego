@@ -116,7 +116,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		iSegmentsToAdd := 0
 		for iToken := 0; iToken < len(segments); iToken++ {
 			if len(segments[iToken].token.text) > 1 {
-				token.segments[iSegmentsToAdd] = &segments[iSegmentsToAdd]
+				token.segments[iSegmentsToAdd] = &segments[iToken]
 				iSegmentsToAdd++
 			}
 		}
