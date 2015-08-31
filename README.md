@@ -8,7 +8,7 @@ Go中文分词
 
 支持普通和搜索引擎两种分词模式，支持用户词典、词性标注，可运行<a href="https://github.com/huichen/sego/blob/master/server/server.go">JSON RPC服务</a>。
 
-分词速度<a href="https://github.com/huichen/sego/blob/master/tools/benchmark.go">单线程</a>2.7MB/s，<a href="https://github.com/huichen/sego/blob/master/tools/goroutines.go">goroutines并发</a>13MB/s, 处理器Core i7-3615QM 2.30GHz 8核。
+分词速度<a href="https://github.com/huichen/sego/blob/master/tools/benchmark.go">单线程</a>2.5MB/s，<a href="https://github.com/huichen/sego/blob/master/tools/goroutines.go">goroutines并发</a>27MB/s, 处理器32核Xeon。
 
 在线演示地址 http://sego.weiboglass.com
 
