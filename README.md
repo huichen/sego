@@ -10,8 +10,6 @@ Go中文分词
 
 分词速度<a href="https://github.com/huichen/sego/blob/master/tools/benchmark.go">单线程</a>2.5MB/s，<a href="https://github.com/huichen/sego/blob/master/tools/goroutines.go">goroutines并发</a>27MB/s, 处理器32核Xeon。
 
-在线演示地址 http://sego.weiboglass.com
-
 # 安装/更新
 
 ```
