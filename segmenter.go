@@ -245,7 +245,7 @@ func maxInt(a, b int) int {
 
 // 将文本划分成字元
 func splitTextToWords(text Text) []Text {
-	output := make([]Text, 0, len(text)/4)
+	output := make([]Text, 0, len(text)/8)
 	current := 0
 	inAlphanumeric := true
 	alphanumericStart := 0
