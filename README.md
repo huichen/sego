@@ -41,3 +41,33 @@ func main() {
 	fmt.Println(sego.SegmentsToString(segments, false)) 
 }
 ```
+
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/huichen/sego"
+)
+
+func init() {
+	// 注册分词器
+	sego.RegisterDefaultSegmenter("github.com/huichen/sego/data/dictionary.txt")
+	sego.RegisterSegmenter("test", "github.com/huichen/sego/data/dictionary.txt")
+}
+
+func main() {
+	// 载入词典
+	segmenter := sego.GetDefaultSegmenter()
+	segmenter2 := sego.GetSegmenter("test")
+
+	// 分词
+	text := []byte("中华人民共和国中央人民政府")
+	segments := segmenter.Segment(text)
+  
+	// 处理分词结果
+	// 支持普通模式和搜索模式两种分词，见代码中SegmentsToString函数的注释。
+	fmt.Println(sego.SegmentsToString(segments, false)) 
+}
+```
