@@ -5,23 +5,30 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/huichen/sego"
 	"log"
 	"os"
 	"runtime"
 	"time"
+
+	"github.com/huichen/sego"
 )
 
 var (
 	segmenter  = sego.Segmenter{}
 	numThreads = runtime.NumCPU()
-	task       = make(chan []byte, numThreads)
+	task       = make(chan []byte, numThreads*10)
+	done       = make(chan bool, numThreads)
 	numRuns    = 10
 )
 
 func worker() {
 	for {
-		segmenter.Segment(<-task)
+		line, ok := <-task
+		if !ok {
+			done <- true
+			return
+		}
+		segmenter.Segment(line)
 	}
 }
 
@@ -65,6 +72,12 @@ func main() {
 		for _, l := range lines {
 			task <- l
 		}
+	}
+	close(task)
+
+	// 确保分词完成
+	for i := 0; i < numThreads; i++ {
+		<-done
 	}
 
 	// 记录时间并计算分词速度
