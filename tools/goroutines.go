@@ -16,7 +16,7 @@ import (
 var (
 	segmenter  = sego.Segmenter{}
 	numThreads = runtime.NumCPU()
-	task       = make(chan []byte, numThreads*10)
+	task       = make(chan []byte, numThreads*40)
 	done       = make(chan bool, numThreads)
 	numRuns    = 50
 )
