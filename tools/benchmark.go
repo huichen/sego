@@ -28,11 +28,13 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
 	"log"
 	"os"
+	"runtime"
 	"runtime/pprof"
 	"time"
+
+	"github.com/huichen/sego"
 )
 
 var (
@@ -42,6 +44,9 @@ var (
 )
 
 func main() {
+	// 确保单线程，因为Go从1.5开始默认多线程
+	runtime.GOMAXPROCS(1)
+
 	// 解析命令行参数
 	flag.Parse()
 
