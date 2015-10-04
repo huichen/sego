@@ -113,11 +113,13 @@ func main() {
 	}
 
 	// 分词
-	for _, l := range lines {
-		segments := segmenter.Segment(l)
-		if *output != "" {
-			of.WriteString(sego.SegmentsToString(segments, false))
-			of.WriteString("\n")
+	for i := 0; i < 20; i++ {
+		for _, l := range lines {
+			segments := segmenter.Segment(l)
+			if *output != "" {
+				of.WriteString(sego.SegmentsToString(segments, false))
+				of.WriteString("\n")
+			}
 		}
 	}
 
@@ -129,5 +131,5 @@ func main() {
 	// 记录时间并计算分词速度
 	t3 := time.Now()
 	log.Printf("分词花费时间 %v", t3.Sub(t2))
-	log.Printf("分词速度 %f MB/s", float64(size)/t3.Sub(t2).Seconds()/(1024*1024))
+	log.Printf("分词速度 %f MB/s", float64(20*size)/t3.Sub(t2).Seconds()/(1024*1024))
 }

@@ -87,7 +87,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			// 将分词添加到字典中
 			words := splitTextToWords([]byte(text))
 			token := Token{text: words, frequency: frequency, pos: pos}
-			seg.dict.addToken(&token)
+			seg.dict.addToken(token)
 		}
 	}
 
