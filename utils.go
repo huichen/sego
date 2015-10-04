@@ -1,6 +1,7 @@
 package sego
 
 import (
+	"bytes"
 	"fmt"
 )
 
@@ -81,4 +82,12 @@ func textSliceByteLength(text []Text) (length int) {
 		length += len(word)
 	}
 	return
+}
+
+func textSliceToBytes(text []Text) []byte {
+	var buf bytes.Buffer
+	for _, word := range text {
+		buf.Write(word)
+	}
+	return buf.Bytes()
 }

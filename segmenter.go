@@ -42,7 +42,7 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 // 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
 func (seg *Segmenter) LoadDictionary(files string) {
-	seg.dict = new(Dictionary)
+	seg.dict = NewDictionary()
 	for _, file := range strings.Split(files, ",") {
 		log.Printf("载入sego词典 %s", file)
 		dictFile, err := os.Open(file)

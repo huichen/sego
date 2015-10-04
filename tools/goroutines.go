@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/huichen/sego"
+	"github.com/adamzy/sego"
 )
 
 var (
