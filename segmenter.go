@@ -124,9 +124,6 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		}
 	}
 
-	keys, nodes, size, capacity := seg.dict.trie.Status()
-	fmt.Println(keys, nodes, size, capacity, float32(nodes)/float32(size))
-
 	log.Println("sego词典载入完毕")
 }
 
