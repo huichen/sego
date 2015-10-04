@@ -93,12 +93,14 @@ func (seg *Segmenter) LoadDictionary(files string) {
 
 	// 计算每个分词的路径值，路径值含义见Token结构体的注释
 	logTotalFrequency := float32(math.Log2(float64(seg.dict.totalFrequency)))
-	for _, token := range seg.dict.tokens {
+	for i := range seg.dict.tokens {
+		token := &seg.dict.tokens[i]
 		token.distance = logTotalFrequency - float32(math.Log2(float64(token.frequency)))
 	}
 
 	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体的注释。
-	for _, token := range seg.dict.tokens {
+	for i := range seg.dict.tokens {
+		token := &seg.dict.tokens[i]
 		segments := seg.segmentWords(token.text, true)
 
 		// 计算需要添加的子分词数目
@@ -121,6 +123,9 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			}
 		}
 	}
+
+	keys, nodes, size, capacity := seg.dict.trie.Status()
+	fmt.Println(keys, nodes, size, capacity, float32(nodes)/float32(size))
 
 	log.Println("sego词典载入完毕")
 }
@@ -245,7 +250,7 @@ func maxInt(a, b int) int {
 
 // 将文本划分成字元
 func splitTextToWords(text Text) []Text {
-	output := make([]Text, 0, len(text)/8)
+	output := make([]Text, 0, len(text)/3)
 	current := 0
 	inAlphanumeric := true
 	alphanumericStart := 0

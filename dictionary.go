@@ -32,6 +32,11 @@ func (dict *Dictionary) TotalFrequency() int64 {
 
 // 向词典中加入一个分词
 func (dict *Dictionary) addToken(token Token) {
+	_, err := dict.trie.Get(textSliceToBytes(token.text))
+	if err == nil {
+		return
+	}
+
 	dict.trie.Insert(textSliceToBytes(token.text), dict.NumTokens())
 	dict.tokens = append(dict.tokens, token)
 	dict.totalFrequency += int64(token.frequency)
