@@ -18,7 +18,7 @@ var (
 	numThreads = runtime.NumCPU()
 	task       = make(chan []byte, numThreads*10)
 	done       = make(chan bool, numThreads)
-	numRuns    = 10
+	numRuns    = 50
 )
 
 func worker() {
