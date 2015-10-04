@@ -16,8 +16,7 @@ func NewDictionary() *Dictionary {
 
 // 词典中最长的分词
 func (dict *Dictionary) MaxTokenLength() int {
-	// return dict.maxTokenLength
-	return 15
+	return dict.maxTokenLength
 }
 
 // 词典中分词数目
