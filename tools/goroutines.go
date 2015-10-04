@@ -22,14 +22,10 @@ var (
 )
 
 func worker() {
-	for {
-		line, ok := <-task
-		if !ok {
-			done <- true
-			return
-		}
+	for line := range task {
 		segmenter.Segment(line)
 	}
+	done <- true
 }
 
 func main() {
