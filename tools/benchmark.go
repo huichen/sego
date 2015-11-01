@@ -28,13 +28,12 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"github.com/huichen/sego"
 	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"time"
-
-	"github.com/adamzy/sego"
 )
 
 var (
