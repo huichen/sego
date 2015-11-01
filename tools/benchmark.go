@@ -28,20 +28,26 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
 	"log"
 	"os"
+	"runtime"
 	"runtime/pprof"
 	"time"
+
+	"github.com/adamzy/sego"
 )
 
 var (
 	cpuprofile = flag.String("cpuprofile", "", "处理器profile文件")
 	memprofile = flag.String("memprofile", "", "内存profile文件")
 	output     = flag.String("output", "", "输出分词结果到此文件")
+	numRuns    = 20
 )
 
 func main() {
+	// 确保单线程，因为Go从1.5开始默认多线程
+	runtime.GOMAXPROCS(1)
+
 	// 解析命令行参数
 	flag.Parse()
 
@@ -108,11 +114,13 @@ func main() {
 	}
 
 	// 分词
-	for _, l := range lines {
-		segments := segmenter.Segment(l)
-		if *output != "" {
-			of.WriteString(sego.SegmentsToString(segments, false))
-			of.WriteString("\n")
+	for i := 0; i < numRuns; i++ {
+		for _, l := range lines {
+			segments := segmenter.Segment(l)
+			if *output != "" {
+				of.WriteString(sego.SegmentsToString(segments, false))
+				of.WriteString("\n")
+			}
 		}
 	}
 
@@ -124,5 +132,5 @@ func main() {
 	// 记录时间并计算分词速度
 	t3 := time.Now()
 	log.Printf("分词花费时间 %v", t3.Sub(t2))
-	log.Printf("分词速度 %f MB/s", float64(size)/t3.Sub(t2).Seconds()/(1024*1024))
+	log.Printf("分词速度 %f MB/s", float64(size*numRuns)/t3.Sub(t2).Seconds()/(1024*1024))
 }
