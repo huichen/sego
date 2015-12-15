@@ -15,7 +15,7 @@ import (
 //
 // 搜索模式主要用于给搜索引擎提供尽可能多的关键字，详情请见Token结构体的注释。
 func SegmentsToString(segs []Segment, searchMode bool) (output string) {
-	tmp := make([][]byte, len(segs)+1)
+	tmp := make([][]byte, len(segs))
 
 	if searchMode {
 		for k, seg := range segs {
