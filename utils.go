@@ -15,25 +15,25 @@ import (
 //
 // 搜索模式主要用于给搜索引擎提供尽可能多的关键字，详情请见Token结构体的注释。
 func SegmentsToString(segs []Segment, searchMode bool) (output string) {
+	tmp := make([][]byte, len(segs))
+
 	if searchMode {
-		for _, seg := range segs {
-			output += tokenToString(seg.token)
+		for k, seg := range segs {
+			tmp[k] = textSliceToBytes(seg.token.text)
 		}
 	} else {
-		for _, seg := range segs {
-			output += fmt.Sprintf(
-				"%s/%s ", textSliceToString(seg.token.text), seg.token.pos)
+		for k, seg := range segs {
+			tmp[k] = tokenToBytes(seg.token)
 		}
 	}
-	return
+	return string(bytes.Join(tmp, nil))
 }
 
-func tokenToString(token *Token) (output string) {
+func tokenToBytes(token *Token) (output []byte) {
 	for _, s := range token.segments {
-		output += tokenToString(s.token)
+		output = append(output, tokenToBytes(s.token)...)
 	}
-	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.pos)
-	return
+	return append(output, []byte(fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.pos))...)
 }
 
 // 输出分词结果到一个字符串slice
@@ -69,11 +69,7 @@ func tokenToSlice(token *Token) (output []string) {
 
 // 将多个字元拼接一个字符串输出
 func textSliceToString(text []Text) string {
-	var output string
-	for _, word := range text {
-		output += string(word)
-	}
-	return output
+	return string(textSliceToBytes(text))
 }
 
 // 返回多个字元的字节总长度

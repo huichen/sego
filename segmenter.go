@@ -8,7 +8,6 @@ import (
 	"math"
 	"os"
 	"strconv"
-	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -41,15 +40,15 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 //
 // 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
-func (seg *Segmenter) LoadDictionary(files string) {
+func (seg *Segmenter) LoadDictionary(files ...string) {
 	seg.dict = NewDictionary()
-	for _, file := range strings.Split(files, ",") {
+	for _, file := range files {
 		log.Printf("载入sego词典 %s", file)
 		dictFile, err := os.Open(file)
-		defer dictFile.Close()
 		if err != nil {
 			log.Fatalf("无法载入字典文件 \"%s\" \n", file)
 		}
+		defer dictFile.Close()
 
 		reader := bufio.NewReader(dictFile)
 		var text string
@@ -141,7 +140,7 @@ func (seg *Segmenter) Segment(bytes []byte) []Segment {
 func (seg *Segmenter) internalSegment(bytes []byte, searchMode bool) []Segment {
 	// 处理特殊情况
 	if len(bytes) == 0 {
-		return []Segment{}
+		return nil
 	}
 
 	// 划分字元
@@ -153,7 +152,7 @@ func (seg *Segmenter) internalSegment(bytes []byte, searchMode bool) []Segment {
 func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 	// 搜索模式下该分词已无继续划分可能的情况
 	if searchMode && len(text) == 1 {
-		return []Segment{}
+		return nil
 	}
 
 	// jumpers定义了每个字元处的向前跳转信息，包括这个跳转对应的分词，
