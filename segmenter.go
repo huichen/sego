@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/wangkuiyi/fs"
 )
 
 const (
@@ -45,7 +46,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 	seg.dict = NewDictionary()
 	for _, file := range strings.Split(files, ",") {
 		log.Printf("载入sego词典 %s", file)
-		dictFile, err := os.Open(file)
+		dictFile, err := fs.Open(file)
 		defer dictFile.Close()
 		if err != nil {
 			log.Fatalf("无法载入字典文件 \"%s\" \n", file)
