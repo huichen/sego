@@ -63,16 +63,11 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			if size == 0 {
 				// 文件结束
 				break
-			} else if size < 2 {
-				// 无效行
-				continue
-			} else if size == 2 {
-				// 没有词性标注时设为空字符串
-				pos = ""
 			}
 
 			// 项目对词频没有需求，直接设置成最小词频
 			frequency = minTokenFrequency
+			pos = ""
 
 			// 解析词频
 			// var err error
