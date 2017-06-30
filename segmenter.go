@@ -7,8 +7,7 @@ import (
 	"log"
 	"math"
 	"os"
-	"strconv"
-	"strings"
+	"path/filepath"
 	"unicode"
 	"unicode/utf8"
 )
@@ -36,14 +35,19 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 // 从文件中载入词典
 //
 // 可以载入多个词典文件，文件名用","分隔，排在前面的词典优先载入分词，比如
-// 	"用户词典.txt,通用词典.txt"
+//	"用户词典.txt,通用词典.txt"
 // 当一个分词既出现在用户词典也出现在通用词典中，则优先使用用户词典。
 //
 // 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
-func (seg *Segmenter) LoadDictionary(files string) {
+func (seg *Segmenter) LoadDictionary(globPattern string) {
+	files, err := filepath.Glob(globPattern)
+	if err != nil {
+		log.Fatalf("Glob pattern error: %s \n", globPattern)
+	}
+
 	seg.dict = NewDictionary()
-	for _, file := range strings.Split(files, ",") {
+	for _, file := range files {
 		log.Printf("载入sego词典 %s", file)
 		dictFile, err := os.Open(file)
 		defer dictFile.Close()
@@ -64,25 +68,23 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			if size == 0 {
 				// 文件结束
 				break
-			} else if size < 2 {
-				// 无效行
-				continue
-			} else if size == 2 {
-				// 没有词性标注时设为空字符串
-				pos = ""
 			}
+
+			// 项目对词频没有需求，直接设置成最小词频
+			frequency = minTokenFrequency
+			pos = ""
 
 			// 解析词频
-			var err error
-			frequency, err = strconv.Atoi(freqText)
-			if err != nil {
-				continue
-			}
+			// var err error
+			// frequency, err = strconv.Atoi(freqText)
+			// if err != nil {
+			//	continue
+			// }
 
 			// 过滤频率太小的词
-			if frequency < minTokenFrequency {
-				continue
-			}
+			// if frequency < minTokenFrequency {
+			//	continue
+			// }
 
 			// 将分词添加到字典中
 			words := splitTextToWords([]byte(text))
@@ -218,7 +220,7 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 }
 
 // 更新跳转信息:
-// 	1. 当该位置从未被访问过时(jumper.minDistance为零的情况)，或者
+//	1. 当该位置从未被访问过时(jumper.minDistance为零的情况)，或者
 //	2. 当该位置的当前最短路径大于新的最短路径时
 // 将当前位置的最短路径值更新为baseDistance加上新分词的概率
 func updateJumper(jumper *jumper, baseDistance float32, token *Token) {
