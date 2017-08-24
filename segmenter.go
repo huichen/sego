@@ -127,6 +127,97 @@ func (seg *Segmenter) LoadDictionary(files string) {
 	log.Println("sego词典载入完毕")
 }
 
+//copy of LoadDictionary that loads from []byte instead of a file
+//Meant to be used with a data file compiled into the users project
+func (seg *Segmenter) LoadDictionaryByte(input []byte) {
+	seg.dict = NewDictionary()
+	var text string
+	var freqText string
+	var frequency int
+	var pos string
+
+	// 逐行读入分词
+	// Read line word by line
+	for _, line := range input {
+
+		l := strings.Split(string(line), " ")
+		size := len(l)
+
+		if size == 0 {
+			// 文件结束
+			//reached EOF
+			break
+		} else if size < 2 {
+			// 无效行
+			// invalid line
+			continue
+		} else if size == 2 {
+			// 没有词性标注时设为空字符串
+			// An empty string is not specified when there is no part of speech
+			text = l[0]
+			freqText = l[1]
+			pos = ""
+		} else {
+			text = l[0]
+			freqText = l[1]
+			pos = l[2]
+		}
+
+		// 解析词频
+		// Parse word frequency field
+		var err error
+		frequency, err = strconv.Atoi(freqText)
+		if err != nil {
+			continue
+		}
+
+		// 过滤频率太小的词
+		if frequency < minTokenFrequency {
+			continue
+		}
+
+		// 将分词添加到字典中
+		words := splitTextToWords([]byte(text))
+		token := Token{text: words, frequency: frequency, pos: pos}
+		seg.dict.addToken(token)
+	}
+
+	// 计算每个分词的路径值，路径值含义见Token结构体的注释
+	logTotalFrequency := float32(math.Log2(float64(seg.dict.totalFrequency)))
+	for i := range seg.dict.tokens {
+		token := &seg.dict.tokens[i]
+		token.distance = logTotalFrequency - float32(math.Log2(float64(token.frequency)))
+	}
+
+	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体的注释。
+	for i := range seg.dict.tokens {
+		token := &seg.dict.tokens[i]
+		segments := seg.segmentWords(token.text, true)
+
+		// 计算需要添加的子分词数目
+		numTokensToAdd := 0
+		for iToken := 0; iToken < len(segments); iToken++ {
+			if len(segments[iToken].token.text) > 1 {
+				// 略去字元长度为一的分词
+				// TODO: 这值得进一步推敲，特别是当字典中有英文复合词的时候
+				numTokensToAdd++
+			}
+		}
+		token.segments = make([]*Segment, numTokensToAdd)
+
+		// 添加子分词
+		iSegmentsToAdd := 0
+		for iToken := 0; iToken < len(segments); iToken++ {
+			if len(segments[iToken].token.text) > 1 {
+				token.segments[iSegmentsToAdd] = &segments[iToken]
+				iSegmentsToAdd++
+			}
+		}
+	}
+
+	log.Println("sego词典载入完毕")
+}
+
 // 对文本分词
 //
 // 输入参数：
