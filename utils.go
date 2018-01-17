@@ -29,8 +29,19 @@ func SegmentsToString(segs []Segment, searchMode bool) (output string) {
 }
 
 func tokenToString(token *Token) (output string) {
+	hasOnlyTerminalToken := true
 	for _, s := range token.segments {
-		output += tokenToString(s.token)
+		if len(s.token.segments) > 1 {
+			hasOnlyTerminalToken = false
+		}
+	}
+
+	if !hasOnlyTerminalToken {
+		for _, s := range token.segments {
+			if s != nil {
+				output += tokenToString(s.token)
+			}
+		}
 	}
 	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.pos)
 	return
@@ -60,8 +71,16 @@ func SegmentsToSlice(segs []Segment, searchMode bool) (output []string) {
 }
 
 func tokenToSlice(token *Token) (output []string) {
+	hasOnlyTerminalToken := true
 	for _, s := range token.segments {
-		output = append(output, tokenToSlice(s.token)...)
+		if len(s.token.segments) > 1 {
+			hasOnlyTerminalToken = false
+		}
+	}
+	if !hasOnlyTerminalToken {
+		for _, s := range token.segments {
+			output = append(output, tokenToSlice(s.token)...)
+		}
 	}
 	output = append(output, textSliceToString(token.text))
 	return output
