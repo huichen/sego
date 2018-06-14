@@ -95,6 +95,34 @@ func textSliceToString(text []Text) string {
 	return output
 }
 
+func Join(a []Text) string {
+	switch len(a) {
+	case 0:
+		return ""
+	case 1:
+		return string(a[0])
+	case 2:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return string(a[0]) + string(a[1])
+	case 3:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return string(a[0]) + string(a[1]) + string(a[2])
+	}
+	n := 0
+	for i := 0; i < len(a); i++ {
+		n += len(a[i])
+	}
+
+	b := make([]byte, n)
+	bp := copy(b, a[0])
+	for _, s := range a[1:] {
+		bp += copy(b[bp:], s)
+	}
+	return string(b)
+}
+
 // 返回多个字元的字节总长度
 func textSliceByteLength(text []Text) (length int) {
 	for _, word := range text {
