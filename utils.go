@@ -3,7 +3,6 @@ package sego
 import (
 	"bytes"
 	"fmt"
-	"sync"
 )
 
 // 输出分词结果为字符串
