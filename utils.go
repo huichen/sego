@@ -88,11 +88,7 @@ func tokenToSlice(token *Token) (output []string) {
 
 // 将多个字元拼接一个字符串输出
 func textSliceToString(text []Text) string {
-	var output string
-	for _, word := range text {
-		output += string(word)
-	}
-	return output
+	return Join(text)
 }
 
 func Join(a []Text) string {
