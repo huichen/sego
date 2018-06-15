@@ -91,58 +91,27 @@ func textSliceToString(text []Text) string {
 	return Join(text)
 }
 
-var globalMemPool *MemPool
-
-type memPoolOption struct {
-	bufLen int
-}
-
-type MemPool struct {
-	buffer    []byte
-	bufCurent int
-	option    *memPoolOption
-}
-
-func (p *MemPool) GetBytes(n int) []byte {
-	if n > p.option.bufLen {
-		bigbyte := make([]byte, n)
-		return bigbyte
-	}
-	if p.bufCurent+n >= p.option.bufLen {
-		p.buffer = make([]byte, p.option.bufLen)
-		p.bufCurent = 0
-	}
-	startOps := p.bufCurent
-	p.bufCurent += n
-	return p.buffer[startOps:p.bufCurent]
-}
-
-func WithMemPool(bufLen int) {
-	option := &memPoolOption{bufLen: bufLen}
-	globalMemPool = &MemPool{
-		buffer: make([]byte, option.bufLen),
-		option: option,
-	}
-}
-
 func Join(a []Text) string {
 	switch len(a) {
 	case 0:
 		return ""
 	case 1:
 		return string(a[0])
+	case 2:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return string(a[0]) + string(a[1])
+	case 3:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return string(a[0]) + string(a[1]) + string(a[2])
 	}
 	n := 0
 	for i := 0; i < len(a); i++ {
 		n += len(a[i])
 	}
 
-	var b []byte
-	if globalMemPool != nil {
-		b = globalMemPool.GetBytes(n)
-	} else {
-		b = make([]byte, n)
-	}
+	b := make([]byte, n)
 	bp := copy(b, a[0])
 	for _, s := range a[1:] {
 		bp += copy(b[bp:], s)
