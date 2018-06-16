@@ -50,6 +50,13 @@ func (token *Token) Segments() []*Segment {
 }
 
 func (token *Token) TextEquals(string string) bool {
+	tokenLen := 0
+	for _, t := range token.text {
+		tokenLen += len(t)
+	}
+	if tokenLen != len(string) {
+		return false
+	}
 	bytStr := []byte(string)
 	index := 0
 	for i := 0; i < len(token.text); i++ {
@@ -60,10 +67,7 @@ func (token *Token) TextEquals(string string) bool {
 				return false
 			}
 			index = index + 1
-			if index >= len((bytStr)) {
-				return false
-			}
 		}
 	}
-	return index == len(bytStr)
+	return true
 }
