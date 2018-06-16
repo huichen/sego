@@ -91,3 +91,13 @@ func Test_Token_TextNotEquals_CN(t *testing.T){
 	}
 	assert.False(t,token.TextEquals("中国文字1"))
 }
+
+func Test_Token_TextNotEquals_CN_B(t *testing.T){
+	token := Token{
+		text:[]Text{
+			[]byte("中国"),
+			[]byte("文字"),
+		},
+	}
+	assert.False(t,token.TextEquals("中国文"))
+}
