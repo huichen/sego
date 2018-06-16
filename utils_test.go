@@ -50,3 +50,44 @@ func Test_Benchmark(t *testing.T) {
 	fmt.Println("textSliceToString")
 	fmt.Println(testing.Benchmark(TextSliceToString))
 }
+
+
+func Test_Token_TextEquals(t *testing.T){
+	token := Token{
+		text:[]Text{
+			[]byte("one"),
+			[]byte("two"),
+		},
+	}
+	assert.True(t,token.TextEquals("onetwo"))
+}
+
+func Test_Token_TextEquals_CN(t *testing.T){
+	token := Token{
+		text:[]Text{
+			[]byte("中国"),
+			[]byte("文字"),
+		},
+	}
+	assert.True(t,token.TextEquals("中国文字"))
+}
+
+func Test_Token_TextNotEquals(t *testing.T){
+	token := Token{
+		text:[]Text{
+			[]byte("one"),
+			[]byte("two"),
+		},
+	}
+	assert.False(t,token.TextEquals("one-two"))
+}
+
+func Test_Token_TextNotEquals_CN(t *testing.T){
+	token := Token{
+		text:[]Text{
+			[]byte("中国"),
+			[]byte("文字"),
+		},
+	}
+	assert.False(t,token.TextEquals("中国文字1"))
+}

@@ -1,5 +1,7 @@
 package sego
 
+import "fmt"
+
 // 字串类型，可以用来表达
 //	1. 一个字元，比如"中"又如"国", 英文的一个字元是一个词
 //	2. 一个分词，比如"中国"又如"人口"
@@ -47,4 +49,21 @@ func (token *Token) Pos() string {
 // 用于搜索引擎对一段文本进行全文搜索。
 func (token *Token) Segments() []*Segment {
 	return token.segments
+}
+
+func (token *Token) TextEquals(string string) bool {
+	bytStr := []byte(string)
+	index := 0
+	for i := 0; i < len(token.text); i++ {
+		textArray := []byte(token.text[i])
+		for j := 0; j < len(textArray); j++ {
+			if textArray[j] != bytStr[index] {
+				fmt.Println(i, j, textArray[j], index, bytStr[index])
+				index = index + 1
+				return false
+			}
+			index = index + 1
+		}
+	}
+	return index == len(bytStr)
 }
