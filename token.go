@@ -48,3 +48,26 @@ func (token *Token) Pos() string {
 func (token *Token) Segments() []*Segment {
 	return token.segments
 }
+
+func (token *Token) TextEquals(string string) bool {
+	tokenLen := 0
+	for _, t := range token.text {
+		tokenLen += len(t)
+	}
+	if tokenLen != len(string) {
+		return false
+	}
+	bytStr := []byte(string)
+	index := 0
+	for i := 0; i < len(token.text); i++ {
+		textArray := []byte(token.text[i])
+		for j := 0; j < len(textArray); j++ {
+			if textArray[j] != bytStr[index] {
+				index = index + 1
+				return false
+			}
+			index = index + 1
+		}
+	}
+	return true
+}
