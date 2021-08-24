@@ -106,7 +106,9 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		// 计算需要添加的子分词数目
 		numTokensToAdd := 0
 		for iToken := 0; iToken < len(segments); iToken++ {
-			if len(segments[iToken].token.text) > 0 {
+			if len(segments[iToken].token.text) > 1 {
+				// 略去字元长度为一的分词
+				// TODO: 这值得进一步推敲，特别是当字典中有英文复合词的时候
 				numTokensToAdd++
 			}
 		}
@@ -115,7 +117,7 @@ func (seg *Segmenter) LoadDictionary(files string) {
 		// 添加子分词
 		iSegmentsToAdd := 0
 		for iToken := 0; iToken < len(segments); iToken++ {
-			if len(segments[iToken].token.text) > 0 {
+			if len(segments[iToken].token.text) > 1 {
 				token.segments[iSegmentsToAdd] = &segments[iToken]
 				iSegmentsToAdd++
 			}
@@ -134,17 +136,6 @@ func (seg *Segmenter) LoadDictionary(files string) {
 //	[]Segment	划分的分词
 func (seg *Segmenter) Segment(bytes []byte) []Segment {
 	return seg.internalSegment(bytes, false)
-}
-
-func (seg *Segmenter) InternalSegment(bytes []byte, searchMode bool) []Segment {
-	return seg.internalSegment(bytes, searchMode)
-}
-
-// 释放资源
-func (seg *Segmenter) Close() {
-	if seg.dict != nil {
-		seg.dict.Close()
-	}
 }
 
 func (seg *Segmenter) internalSegment(bytes []byte, searchMode bool) []Segment {
