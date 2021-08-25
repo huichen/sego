@@ -43,12 +43,13 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 //	分词文本 频率 词性
 func (seg *Segmenter) LoadDictionary(files string) {
 	seg.dict = NewDictionary()
-	for _, file := range strings.Split(files, ",") {
-		log.Printf("载入sego词典 %s", file)
-		dictFile, err := os.Open(file)
+
+	// 处理字典文件
+	processDictFile := func(fileName string) {
+		dictFile, err := os.Open(fileName)
 		defer dictFile.Close()
 		if err != nil {
-			log.Fatalf("无法载入字典文件 \"%s\" \n", file)
+			log.Fatalf("无法载入字典文件 \"%s\" \n", fileName)
 		}
 
 		reader := bufio.NewReader(dictFile)
@@ -89,6 +90,12 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			token := Token{text: words, frequency: frequency, pos: pos}
 			seg.dict.addToken(token)
 		}
+	}
+
+	for _, file := range strings.Split(files, ",") {
+		log.Printf("载入sego词典 %s", file)
+		// 处理多个字典文件时，避免file对象生命周期延长的问题
+		processDictFile(file)
 	}
 
 	// 计算每个分词的路径值，路径值含义见Token结构体的注释
