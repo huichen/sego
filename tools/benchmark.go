@@ -29,7 +29,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
+	"github.com/liu-xuewen/sego"
 	"log"
 	"os"
 	"runtime"

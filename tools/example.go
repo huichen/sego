@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
+	"github.com/liu-xuewen/sego"
 )
 
 var (

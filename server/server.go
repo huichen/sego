@@ -26,7 +26,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
+	"github.com/liu-xuewen/sego"
 	"io"
 	"log"
 	"net/http"
@@ -34,11 +34,11 @@ import (
 )
 
 var (
-	host      = flag.String("host", "", "HTTP服务器主机名")
-	port      = flag.Int("port", 8080, "HTTP服务器端口")
-	dict      = flag.String("dict", "../data/dictionary.txt", "词典文件")
+	host         = flag.String("host", "", "HTTP服务器主机名")
+	port         = flag.Int("port", 8080, "HTTP服务器端口")
+	dict         = flag.String("dict", "../data/dictionary.txt", "词典文件")
 	staticFolder = flag.String("static_folder", "static", "静态页面存放的目录")
-	segmenter = sego.Segmenter{}
+	segmenter    = sego.Segmenter{}
 )
 
 type JsonResponse struct {
