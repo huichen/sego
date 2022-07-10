@@ -26,6 +26,7 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"flag"
 	"fmt"
 	"github.com/huichen/sego"
@@ -40,8 +41,11 @@ var (
 	cpuprofile = flag.String("cpuprofile", "", "处理器profile文件")
 	memprofile = flag.String("memprofile", "", "内存profile文件")
 	output     = flag.String("output", "", "输出分词结果到此文件")
-	numRuns    = 20
+	//numRuns    = 20
 )
+
+//go:embed data
+var dataFS embed.FS
 
 func main() {
 	// 确保单线程，因为Go从1.5开始默认多线程
@@ -54,7 +58,7 @@ func main() {
 	t0 := time.Now()
 
 	var segmenter sego.Segmenter
-	segmenter.LoadDictionary("../data/dictionary.txt")
+	segmenter.LoadDictionary(dataFS, "../data/dictionary.txt")
 
 	// 记录时间
 	t1 := time.Now()

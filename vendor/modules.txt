@@ -1,9 +1,0 @@
-# github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d
-## explicit
-github.com/adamzy/cedar-go
-# github.com/adamzy/sego v0.0.0-20151004184924-5eab9a44f8e8
-## explicit
-github.com/adamzy/sego
-# github.com/issue9/assert v1.4.1
-## explicit
-github.com/issue9/assert
