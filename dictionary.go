@@ -2,7 +2,7 @@ package sego
 
 import "github.com/adamzy/cedar-go"
 
-// Dictionary结构体实现了一个字串前缀树，一个分词可能出现在叶子节点也有可能出现在非叶节点
+// Dictionary 结构体实现了一个字串前缀树，一个分词可能出现在叶子节点也有可能出现在非叶节点
 type Dictionary struct {
 	trie           *cedar.Cedar // Cedar 前缀树
 	maxTokenLength int          // 词典中最长的分词
@@ -14,22 +14,22 @@ func NewDictionary() *Dictionary {
 	return &Dictionary{trie: cedar.New()}
 }
 
-// 词典中最长的分词
+// MaxTokenLength 词典中最长的分词
 func (dict *Dictionary) MaxTokenLength() int {
 	return dict.maxTokenLength
 }
 
-// 词典中分词数目
+// NumTokens 词典中分词数目
 func (dict *Dictionary) NumTokens() int {
 	return len(dict.tokens)
 }
 
-// 词典中所有分词的频率之和
+// TotalFrequency 词典中所有分词的频率之和
 func (dict *Dictionary) TotalFrequency() int64 {
 	return dict.totalFrequency
 }
 
-// 释放资源
+// Close 释放资源
 func (dict *Dictionary) Close() {
 	dict.trie = nil
 	dict.maxTokenLength = 0
